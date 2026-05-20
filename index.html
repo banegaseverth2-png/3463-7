@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Apext — Financial information consulting. Interactive intelligence platform for global institutions.">
+  <title>Apext | Financial Information Consulting</title>
+  <style>
+    :root {
+      --primary: #FACC15;
+      --secondary: #BFDBFE;
+      --accent: #DC2626;
+      --label: #CA8A04;
+      --note: #854D0E;
+      --ink: #0F172A;
+      --ink-2: #334155;
+      --surface: #FFFBEB;
+      --card: #FFFFFF;
+      --sidebar-w: 260px;
+      --header-h: 64px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --t: 0.4s var(--ease);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: "Georgia", "Times New Roman", serif;
+      background: var(--surface);
+      color: var(--ink);
+      overflow: hidden;
+    }
+    .sans { font-family: "Segoe UI", system-ui, sans-serif; }
+
+    img { max-width: 100%; display: block; object-fit: cover; }
+    button { font: inherit; cursor: pointer; border: none; background: none; }
+    a { color: inherit; text-decoration: none; }
+    input, textarea, select { font: inherit; }
+
+    /* App shell */
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: var(--ink);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      border-right: 4px solid var(--primary);
+      z-index: 200;
+      overflow: hidden;
+    }
+    .brand {
+      padding: 1.5rem 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(145deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+      font-family: system-ui, sans-serif;
+    }
+    .brand h1 {
+      font-family: system-ui, sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.14em;
+      font-weight: 800;
+    }
+    .brand p {
+      font-size: 0.72rem;
+      color: var(--secondary);
+      margin-top: 0.35rem;
+      font-family: system-ui, sans-serif;
+      line-height: 1.4;
+    }
+
+    .nav-rail {
+      flex: 1;
+      padding: 1rem 0.75rem;
+      overflow-y: auto;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.35rem;
+      border-radius: 10px;
+      color: rgba(255,255,255,0.75);
+      font-family: system-ui, sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-align: left;
+      transition: var(--t);
+      border: 2px solid transparent;
+    }
+    .nav-item:hover {
+      background: rgba(250, 204, 21, 0.12);
+      color: #fff;
+    }
+    .nav-item.active {
+      background: var(--primary);
+      color: var(--ink);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .nav-item .icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.08);
+      display: grid;
+      place-items: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .nav-item.active .icon { background: rgba(15,23,42,0.15); }
+
+    .sidebar-foot {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-family: system-ui, sans-serif;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.5);
+    }
+    .sidebar-foot .data-label {
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.65rem;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Main */
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background:
+        radial-gradient(circle at 90% 10%, var(--secondary) 0%, transparent 35%),
+        radial-gradient(circle at 5% 90%, rgba(250,204,21,0.25) 0%, transparent 30%),
+        var(--surface);
+    }
+
+    .topbar {
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      border-bottom: 2px solid var(--secondary);
+      background: rgba(255,251,235,0.85);
+      backdrop-filter: blur(8px);
+      flex-shrink: 0;
+      font-family: system-ui, sans-serif;
+    }
+    .topbar-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink-2);
+    }
+    .topbar-title span { color: var(--accent); }
+    .breadcrumb {
+      font-size: 0.75rem;
+      color: var(--note);
+    }
+    .breadcrumb .data-label { color: var(--label); font-weight: 700; }
+
+    .page-viewport {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page-panel {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      padding: 1.75rem 2rem 2.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(24px);
+      transition: opacity var(--t), transform var(--t), visibility var(--t);
+    }
+    .page-panel.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      z-index: 1;
+    }
+    .page-panel.exit-left {
+      transform: translateX(-24px);
+      opacity: 0;
+    }
+
+    /* Typography */
+    .page-hero {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 3px solid var(--primary);
+    }
+    .page-hero .tag {
+      display: inline-block;
+      background: var(--secondary);
+      color: var(--ink);
+      padding: 0.25rem 0.75rem;
+      font-family: system-ui, sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.75rem;
+      border-left: 4px solid var(--accent);
+    }
+    .page-hero h2 {
+      font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+      line-height: 1.15;
+      font-weight: 400;
+      max-width: 720px;
+    }
+    .page-hero .lead {
+      margin-top: 1rem;
+      font-size: 1.05rem;
+      color: var(--ink-2);
+      max-width: 680px;
+      line-height: 1.75;
+    }
+
+    .data-label {
+      font-family: system-ui, sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--label);
+    }
+    .data-note {
+      font-family: system-ui, sans-serif;
+      font-size: 0.8rem;
+      color: var(--note);
+    }
+
+    /* Home layout — magazine split */
+    .home-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2rem;
+      align-items: stretch;
+      min-height: calc(100% - 120px);
+    }
+    .home-copy h2 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+    }
+    .home-copy h2 em {
+      font-style: normal;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .home-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-box {
+      background: var(--card);
+      border: 2px solid var(--secondary);
+      padding: 1.25rem;
+      border-radius: 12px;
+      transition: var(--t);
+    }
+    .stat-box:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(15,23,42,0.08);
+    }
+    .stat-box .val {
+      font-family: system-ui, sans-serif;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .home-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .home-visual .main-img {
+      flex: 1;
+      min-height: 280px;
+      border-radius: 4px 24px 4px 24px;
+      border: 4px solid var(--ink);
+      box-shadow: 12px 12px 0 var(--primary);
+    }
+    .thumb-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+    }
+    .thumb-row img {
+      height: 72px;
+      border-radius: 8px;
+      border: 2px solid var(--secondary);
+      cursor: pointer;
+      opacity: 0.7;
+      transition: var(--t);
+    }
+    .thumb-row img.active,
+    .thumb-row img:hover {
+      opacity: 1;
+      border-color: var(--accent);
+      transform: scale(1.03);
+    }
+
+    .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+    .btn {
+      font-family: system-ui, sans-serif;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--t);
+    }
+    .btn-gold { background: var(--primary); color: var(--ink); }
+    .btn-gold:hover { box-shadow: 0 8px 20px rgba(250,204,21,0.45); }
+    .btn-red { background: var(--accent); color: #fff; }
+    .btn-red:hover { background: #B91C1C; }
+    .btn-ghost {
+      border: 2px solid var(--ink);
+      color: var(--ink);
+    }
+    .btn-ghost:hover { background: var(--ink); color: #fff; }
+
+    /* Two-column content blocks */
+    .split-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .prose {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--ink-2);
+    }
+    .prose p + p { margin-top: 1rem; }
+    .prose strong { color: var(--ink); }
+
+    .img-frame img {
+      width: 100%;
+      height: 100%;
+      min-height: 240px;
+      border-radius: 16px;
+      border: 3px solid var(--secondary);
+    }
+
+    /* Interactive accordion */
+    .accordion { margin-top: 1.5rem; }
+    .acc-item {
+      background: var(--card);
+      border: 2px solid #E2E8F0;
+      border-radius: 10px;
+      margin-bottom: 0.65rem;
+      overflow: hidden;
+      transition: border-color var(--t);
+    }
+    .acc-item.open { border-color: var(--primary); }
+    .acc-head {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      font-family: system-ui, sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-align: left;
+    }
+    .acc-head .chev {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--secondary);
+      display: grid;
+      place-items: center;
+      font-size: 0.75rem;
+      transition: transform var(--t);
+    }
+    .acc-item.open .acc-head .chev {
+      transform: rotate(180deg);
+      background: var(--primary);
+    }
+    .acc-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s var(--ease);
+    }
+    .acc-body-inner {
+      padding: 0 1.25rem 1.25rem;
+      font-size: 0.92rem;
+      color: var(--ink-2);
+      line-height: 1.7;
+    }
+
+    /* Service tabs */
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .tab-btn {
+      font-family: system-ui, sans-serif;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--card);
+      border: 2px solid var(--secondary);
+      color: var(--ink-2);
+      transition: var(--t);
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .tab-panel {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      animation: fadeUp 0.45s var(--ease);
+    }
+    .tab-panel.active { display: grid; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .tab-panel img {
+      height: 280px;
+      border-radius: 12px;
+      border-left: 6px solid var(--primary);
+    }
+    .feature-list {
+      list-style: none;
+      margin-top: 1rem;
+    }
+    .feature-list li {
+      padding: 0.5rem 0 0.5rem 1.25rem;
+      position: relative;
+      font-size: 0.9rem;
+      color: var(--ink-2);
+      border-bottom: 1px dashed #E2E8F0;
+    }
+    .feature-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.85rem;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+    }
+
+    /* Insights carousel */
+    .carousel-wrap {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    .carousel {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      padding-bottom: 0.5rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .carousel::-webkit-scrollbar { height: 6px; }
+    .carousel::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+    .carousel-card {
+      flex: 0 0 min(320px, 85vw);
+      scroll-snap-align: start;
+      background: var(--ink);
+      color: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform var(--t);
+      border: 3px solid transparent;
+    }
+    .carousel-card.active { border-color: var(--primary); transform: scale(1.02); }
+    .carousel-card img { height: 180px; width: 100%; opacity: 0.85; }
+    .carousel-card .cap {
+      padding: 1rem 1.25rem;
+      font-family: system-ui, sans-serif;
+    }
+    .carousel-card h4 { font-size: 0.95rem; margin-top: 0.25rem; }
+    .carousel-nav {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      justify-content: flex-end;
+    }
+    .carousel-nav button {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .insight-detail {
+      background: var(--card);
+      border: 2px solid var(--secondary);
+      border-radius: 14px;
+      padding: 1.5rem;
+      min-height: 140px;
+    }
+    .insight-detail h3 {
+      font-family: system-ui, sans-serif;
+      font-size: 1.15rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+
+    /* Approach timeline */
+    .timeline {
+      display: flex;
+      gap: 0;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .tl-step {
+      flex: 1;
+      text-align: center;
+      padding: 0 0.5rem;
+      cursor: pointer;
+      position: relative;
+    }
+    .tl-step::before {
+      content: "";
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      right: -50%;
+      height: 3px;
+      background: var(--secondary);
+      z-index: 0;
+    }
+    .tl-step:last-child::before { display: none; }
+    .tl-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 3px solid var(--secondary);
+      margin: 0 auto 0.75rem;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 0.85rem;
+      position: relative;
+      z-index: 1;
+      transition: var(--t);
+    }
+    .tl-step.active .tl-dot,
+    .tl-step:hover .tl-dot {
+      background: var(--primary);
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+    .tl-step span {
+      font-family: system-ui, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--ink-2);
+    }
+    .tl-content {
+      background: linear-gradient(135deg, var(--secondary), var(--card));
+      border-radius: 14px;
+      padding: 1.75rem;
+      border-left: 6px solid var(--accent);
+    }
+    .tl-content h3 {
+      font-family: system-ui, sans-serif;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Team flip grid */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    .team-card {
+      perspective: 800px;
+      height: 320px;
+      cursor: pointer;
+    }
+    .team-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.65s var(--ease);
+      transform-style: preserve-3d;
+    }
+    .team-card.flipped .team-inner { transform: rotateY(180deg); }
+    .team-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid var(--secondary);
+      background: var(--card);
+    }
+    .team-face.back {
+      transform: rotateY(180deg);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .team-face.front img { height: 200px; width: 100%; }
+    .team-face.front .info {
+      padding: 1rem;
+      font-family: system-ui, sans-serif;
+    }
+    .team-face.front .role { color: var(--accent); font-size: 0.8rem; font-weight: 600; }
+    .team-face.back p { font-size: 0.88rem; line-height: 1.65; margin-top: 0.5rem; }
+    .flip-hint {
+      text-align: center;
+      margin-top: 1rem;
+      font-family: system-ui, sans-serif;
+      font-size: 0.8rem;
+      color: var(--note);
+    }
+
+    /* Contact */
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 2rem;
+    }
+    .contact-card {
+      background: var(--ink);
+      color: #fff;
+      border-radius: 16px;
+      padding: 2rem;
+      border-top: 5px solid var(--primary);
+    }
+    .contact-card .row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: flex-start;
+    }
+    .contact-card .ico {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      color: var(--ink);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .contact-card .data-label { color: var(--primary); }
+
+    .form-box {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1.75rem;
+      border: 2px solid var(--secondary);
+      box-shadow: 8px 8px 0 var(--primary);
+    }
+    .form-box h3 {
+      font-family: system-ui, sans-serif;
+      margin-bottom: 1.25rem;
+    }
+    .fg { margin-bottom: 1rem; }
+    .fg label {
+      display: block;
+      font-family: system-ui, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--label);
+      margin-bottom: 0.35rem;
+    }
+    .fg input, .fg textarea, .fg select {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 2px solid #E2E8F0;
+      border-radius: 8px;
+      background: #F8FAFC;
+    }
+    .fg input:focus, .fg textarea:focus, .fg select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-success {
+      display: none;
+      margin-top: 1rem;
+      padding: 1.25rem;
+      background: linear-gradient(135deg, #BBF7D0, var(--secondary));
+      border: 2px solid #22C55E;
+      border-radius: 10px;
+      text-align: center;
+      font-family: system-ui, sans-serif;
+    }
+    .form-success.show { display: block; animation: fadeUp 0.4s ease; }
+    .form-success h4 { color: #15803D; margin-bottom: 0.35rem; }
+
+    /* Mobile bottom nav */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--ink);
+      border-top: 3px solid var(--primary);
+      z-index: 300;
+      padding: 0.35rem 0.25rem calc(0.35rem + env(safe-area-inset-bottom));
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .mobile-nav-inner {
+      display: flex;
+      gap: 0.2rem;
+      min-width: max-content;
+      padding: 0 0.25rem;
+    }
+    .mob-btn {
+      flex: 0 0 auto;
+      padding: 0.5rem 0.65rem;
+      font-family: system-ui, sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.65);
+      border-radius: 8px;
+      text-align: center;
+      min-width: 56px;
+    }
+    .mob-btn.active {
+      background: var(--primary);
+      color: var(--ink);
+    }
+    .menu-fab {
+      display: none;
+      position: fixed;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 250;
+      width: 44px;
+      height: 44px;
+      background: var(--ink);
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .menu-fab span {
+      width: 20px;
+      height: 2px;
+      background: var(--primary);
+      transition: var(--t);
+    }
+    .menu-fab.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-fab.open span:nth-child(2) { opacity: 0; }
+    .menu-fab.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.5);
+      z-index: 180;
+    }
+    .overlay.show { display: block; }
+
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: min(280px, 85vw);
+        transform: translateX(-100%);
+        transition: transform var(--t);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .menu-fab { display: flex; }
+      .mobile-nav { display: block; }
+      .main { padding-bottom: 62px; }
+      .page-panel { padding: 1rem 1rem 5rem; padding-top: 3.5rem; }
+      .home-grid, .split-2, .tab-panel, .contact-layout, .team-grid {
+        grid-template-columns: 1fr;
+      }
+      .tab-panel.active { display: flex; flex-direction: column; }
+      .timeline { flex-direction: column; gap: 0.5rem; }
+      .tl-step::before { display: none; }
+      .team-grid { grid-template-columns: 1fr; }
+      .team-card { height: 300px; }
+      .fg-row { grid-template-columns: 1fr; }
+      .thumb-row { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="menu-fab" id="menuFab" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="overlay" id="overlay"></div>
+
+  <div class="app">
+    <aside class="sidebar sans" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">A</div>
+        <h1>Apext</h1>
+        <p>Financial Information Consulting · Carlisle, UK</p>
+      </div>
+      <nav class="nav-rail" id="navRail">
+        <button class="nav-item active" data-page="home"><span class="icon">⌂</span> Home</button>
+        <button class="nav-item" data-page="about"><span class="icon">◈</span> About Us</button>
+        <button class="nav-item" data-page="services"><span class="icon">◆</span> Services</button>
+        <button class="nav-item" data-page="insights"><span class="icon">▣</span> Insights</button>
+        <button class="nav-item" data-page="approach"><span class="icon">◎</span> Approach</button>
+        <button class="nav-item" data-page="team"><span class="icon">☰</span> Leadership</button>
+        <button class="nav-item" data-page="contact"><span class="icon">✉</span> Contact</button>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="data-label">Head Office</span>
+        42 W Tower St, Carlisle, England<br>
+        <a href="tel:+447839899194" style="color:var(--primary);margin-top:0.35rem;display:inline-block;">+44 7839 899194</a>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div>
+          <div class="topbar-title">Apext <span>·</span> <span id="pageLabel">Home</span></div>
+          <div class="breadcrumb"><span class="data-label">Section</span> <span id="breadcrumbText">Welcome & Overview</span></div>
+        </div>
+        <div class="data-note" id="liveClock"></div>
+      </header>
+
+      <div class="page-viewport" id="viewport">
+
+        <!-- HOME -->
+        <section class="page-panel active" id="panel-home" data-label="Home" data-crumb="Welcome & Overview">
+          <div class="home-grid">
+            <div class="home-copy">
+              <span class="data-label">Est. 2012 · Carlisle, England</span>
+              <h2>Intelligence That Moves <em>Markets Forward</em></h2>
+              <p class="prose">Apext is an independent financial information consultancy serving asset managers, banks, and corporate treasury teams. We transform fragmented data into decisive, regulator-aware intelligence.</p>
+              <div class="home-stats">
+                <div class="stat-box">
+                  <span class="data-label">Global Markets</span>
+                  <div class="val">48+</div>
+                  <p class="data-note">Equities, rates, FX & commodities</p>
+                </div>
+                <div class="stat-box">
+                  <span class="data-label">Client Retention</span>
+                  <div class="val">97%</div>
+                  <p class="data-note">Institutional mandates, 2024–25</p>
+                </div>
+                <div class="stat-box">
+                  <span class="data-label">Annual Reports</span>
+                  <div class="val">2.4K</div>
+                  <p class="data-note">Bespoke & thematic research</p>
+                </div>
+                <div class="stat-box">
+                  <span class="data-label">Priority SLA</span>
+                  <div class="val">&lt;4h</div>
+                  <p class="data-note">Critical intelligence requests</p>
+                </div>
+              </div>
+              <div class="cta-row">
+                <button class="btn btn-red goto" data-goto="contact">Request Consultation</button>
+                <button class="btn btn-gold goto" data-goto="services">Explore Services</button>
+                <button class="btn btn-ghost goto" data-goto="about">Our Story</button>
+              </div>
+            </div>
+            <div class="home-visual">
+              <img class="main-img" id="heroMainImg" src="https://banegaseverth2-png.github.io/3463-7/39.jpg" alt="Apext financial intelligence platform">
+              <div class="thumb-row" id="thumbRow">
+                <img class="active" src="https://banegaseverth2-png.github.io/3463-7/40.jpg" alt="Market overview">
+                <img src="https://banegaseverth2-png.github.io/3463-7/41.jpg" alt="Research desk">
+                <img src="https://banegaseverth2-png.github.io/3463-7/42.jpg" alt="Advisory session">
+              </div>
+              <p class="data-note sans" style="text-align:center;">Click thumbnails to preview gallery · All imagery representative of Apext deliverables</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ABOUT -->
+        <section class="page-panel" id="panel-about" data-label="About Us" data-crumb="Company Profile & Values">
+          <div class="page-hero">
+            <span class="tag sans">Who We Are</span>
+            <h2>Built on Integrity, Powered by Data</h2>
+            <p class="lead">Apext was founded in Carlisle with a singular mission: to give institutional decision-makers information superiority without conflicts of interest. Today we support mandates across EMEA, the Americas, and Asia-Pacific from our UK headquarters.</p>
+          </div>
+          <div class="split-2">
+            <div class="prose">
+              <p><strong>Our heritage.</strong> Beginning as a boutique research desk serving North West England fund managers, Apext evolved into a full-spectrum financial information consultancy. We remain privately held and client-funded — never beholden to sell-side distribution.</p>
+              <p><strong>Our philosophy.</strong> Markets reward clarity. Every Apext engagement is structured around your decision calendar: what you need to know, when you need to know it, and how it changes your risk posture.</p>
+              <p><strong>Our commitment.</strong> We adhere to FCA-aligned advisory frameworks, maintain strict information barriers, and publish methodology notes alongside every major deliverable.</p>
+            </div>
+            <div class="img-frame">
+              <img src="https://banegaseverth2-png.github.io/3463-7/43.jpg" alt="Apext headquarters Carlisle">
+            </div>
+          </div>
+          <p class="data-label sans" style="margin-bottom:0.75rem;">Expand each pillar to learn more</p>
+          <div class="accordion" id="aboutAccordion">
+            <div class="acc-item open">
+              <button class="acc-head">Independent Research Mandate <span class="chev">▼</span></button>
+              <div class="acc-body" style="max-height:200px">
+                <div class="acc-body-inner">Our analysts carry no product distribution responsibilities. Research outputs are peer-reviewed internally and version-controlled for audit trails. Clients receive source attribution, confidence scoring, and explicit limitation statements on every report.</div>
+              </div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-head">Regulatory & Cross-Border Expertise <span class="chev">▼</span></button>
+              <div class="acc-body">
+                <div class="acc-body-inner">From MiFID II transaction reporting to UK EMIR equivalence updates, Apext translates regulation into operational checklists. We maintain living policy trackers and alert clients within hours of material supervisory publications.</div>
+              </div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-head">Technology-Enabled Delivery <span class="chev">▼</span></button>
+              <div class="acc-body">
+                <div class="acc-body-inner">Secure client portals, API feeds, and scheduled PDF briefings ensure intelligence reaches the right stakeholders. Custom dashboards integrate with your existing BI stack — Tableau, Power BI, or internal warehouses.</div>
+              </div>
+            </div>
+            <div class="acc-item">
+              <button class="acc-head">Sustainable Finance Integration <span class="chev">▼</span></button>
+              <div class="acc-body">
+                <div class="acc-body-inner">ESG is embedded across our research stack, not siloed. SFDR classification support, transition risk modelling, and greenwashing detection frameworks are available as modular add-ons to any core mandate.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SERVICES -->
+        <section class="page-panel" id="panel-services" data-label="Services" data-crumb="Advisory Capabilities">
+          <div class="page-hero">
+            <span class="tag sans">What We Deliver</span>
+            <h2>End-to-End Financial Information Services</h2>
+            <p class="lead">Select a service line below to view scope, deliverables, and typical engagement models. Each practice is led by a senior director with a minimum of fifteen years' markets experience.</p>
+          </div>
+          <div class="tab-bar sans" id="serviceTabs">
+            <button class="tab-btn active" data-tab="s1">Market Intelligence</button>
+            <button class="tab-btn" data-tab="s2">Compliance</button>
+            <button class="tab-btn" data-tab="s3">Risk Analytics</button>
+            <button class="tab-btn" data-tab="s4">Corporate Finance</button>
+            <button class="tab-btn" data-tab="s5">ESG Advisory</button>
+            <button class="tab-btn" data-tab="s6">Executive Training</button>
+          </div>
+
+          <div class="tab-panel active" id="s1">
+            <div>
+              <h3 class="sans" style="color:var(--accent);margin-bottom:0.5rem;">Market Intelligence & Research</h3>
+              <p class="prose">Real-time surveillance across equities, fixed income, FX, and commodities. We synthesise licensed feeds, central bank communications, and alternative data into thematic and event-driven reports tailored to your investment committee rhythm.</p>
+              <ul class="feature-list sans">
+                <li>Daily morning brief & weekly sector rotation notes</li>
+                <li>Earnings preview packs with consensus deviation analysis</li>
+                <li>Geopolitical risk heatmaps with portfolio exposure overlays</li>
+                <li>Custom watchlists with SMS/email alert thresholds</li>
+              </ul>
+              <p class="data-note sans" style="margin-top:1rem;"><span class="data-label">Typical mandate</span> — 12-month renewable · from 3 FTE analyst days/week</p>
+            </div>
+            <img src="https://banegaseverth2-png.github.io/3463-7/44.jpg" alt="Market intelligence dashboard">
+          </div>
+          <div class="tab-panel" id="s2">
+            <div>
+              <h3 class="sans" style="color:var(--accent);">Regulatory & Compliance Advisory</h3>
+              <p class="prose">Navigate UK and EU regulatory change with confidence. Apext interprets supervisory guidance into actionable policies, control matrices, and board papers — reducing reliance on generic law-firm summaries.</p>
+              <ul class="feature-list sans">
+                <li>MiFID II / UK onshoring gap assessments</li>
+                <li>EMIR clearing obligation monitoring</li>
+                <li>Consumer Duty impact mapping for wealth managers</li>
+                <li>Regulatory horizon scanning quarterly</li>
+              </ul>
+            </div>
+            <img src="https://banegaseverth2-png.github.io/3463-7/45.jpg" alt="Compliance advisory">
+          </div>
+          <div class="tab-panel" id="s3">
+            <div>
+              <h3 class="sans" style="color:var(--accent);">Risk Analytics & Stress Testing</h3>
+              <p class="prose">Institutional-grade risk frameworks without enterprise software lock-in. We build reproducible models in your environment, document assumptions transparently, and facilitate ICAAP/ILAAP dialogue preparation.</p>
+              <ul class="feature-list sans">
+                <li>VaR / ES backtesting & model validation support</li>
+                <li>Liquidity coverage scenario libraries</li>
+                <li>Climate stress overlays (NGFS pathways)</li>
+                <li>Counterparty concentration dashboards</li>
+              </ul>
+            </div>
+            <img src="https://banegaseverth2-png.github.io/3463-7/46.jpg" alt="Risk analytics">
+          </div>
+          <div class="tab-panel" id="s4">
+            <div>
+              <h3 class="sans" style="color:var(--accent);">Corporate Finance Intelligence</h3>
+              <p class="prose">Support CFOs and strategy teams with timing intelligence for capital markets activity. Peer benchmarking, multiples analysis, and debt capacity modelling inform your next issuance or M&A move.</p>
+              <ul class="feature-list sans">
+                <li>Comparable transaction databases (sector-filtered)</li>
+                <li>Cost of capital refresh & WACC sensitivity</li>
+                <li>Investor perception studies pre-IPO</li>
+                <li>Synergy validation for acquisition targets</li>
+              </ul>
+            </div>
+            <img src="https://banegaseverth2-png.github.io/3463-7/47.jpg" alt="Corporate finance">
+          </div>
+          <div class="tab-panel" id="s5">
+            <div>
+              <h3 class="sans" style="color:var(--accent);">ESG & Sustainable Finance</h3>
+              <p class="prose">Meet investor and regulator expectations with defensible ESG integration. Our methodologies align with TCFD, ISSB, and SFDR while flagging data quality issues that undermine portfolio claims.</p>
+              <ul class="feature-list sans">
+                <li>Portfolio carbon footprint & trajectory analysis</li>
+                <li>SFDR Article 8/9 classification audits</li>
+                <li>Green bond framework second opinions</li>
+                <li>Biodiversity risk screening (TNFD-aligned)</li>
+              </ul>
+            </div>
+            <img src="https://banegaseverth2-png.github.io/3463-7/48.jpg" alt="ESG advisory">
+          </div>
+          <div class="tab-panel" id="s6">
+            <div>
+              <h3 class="sans" style="color:var(--accent);">Executive Briefings & Training</h3>
+              <p class="prose">Equip boards and senior leadership with fluency in complex market dynamics. War-room support during volatility, bespoke workshops, and simulation exercises build organisational resilience.</p>
+              <ul class="feature-list sans">
+                <li>Board pack drafting & Q&A preparation</li>
+                <li>Crisis simulation: rate shock / credit event</li>
+                <li>Derivatives literacy for non-specialists</li>
+                <li>On-site Carlisle workshops (max 20 delegates)</li>
+              </ul>
+            </div>
+            <img src="https://banegaseverth2-png.github.io/3463-7/49.jpg" alt="Executive training">
+          </div>
+        </section>
+
+        <!-- INSIGHTS -->
+        <section class="page-panel" id="panel-insights" data-label="Insights" data-crumb="Research Highlights">
+          <div class="page-hero">
+            <span class="tag sans">Visual Intelligence</span>
+            <h2>Market Insights & Research Gallery</h2>
+            <p class="lead">Browse representative deliverables from our research desk. Select a card or use arrows to explore — full descriptions update interactively below.</p>
+          </div>
+          <div class="carousel-wrap">
+            <div class="carousel sans" id="carousel">
+              <article class="carousel-card active" data-title="Global Macro Dashboard Q1 2026" data-desc="Consolidated view of G10 rates, inflation surprises, and central bank path probabilities. Updated daily with scenario-weighted forecasts and client-specific hedge recommendations.">
+                <img src="https://banegaseverth2-png.github.io/3463-7/50.jpg" alt="Macro dashboard">
+                <div class="cap"><span class="data-label">Featured</span><h4>Global Macro Dashboard</h4></div>
+              </article>
+              <article class="carousel-card" data-title="Yield Curve Monitor" data-desc="Real-time decomposition of curve shifts into level, slope, and curvature factors. Includes BOE and ECB meeting implied paths with historical percentile bands.">
+                <img src="https://banegaseverth2-png.github.io/3463-7/51.jpg" alt="Yield curve">
+                <div class="cap"><span class="data-label">Fixed Income</span><h4>Yield Curve Monitor</h4></div>
+              </article>
+              <article class="carousel-card" data-title="Sector Rotation Matrix" data-desc="Relative strength rankings across eleven GICS sectors with earnings revision momentum overlays. Rebalanced weekly for tactical asset allocation committees.">
+                <img src="https://banegaseverth2-png.github.io/3463-7/52.jpg" alt="Sector rotation">
+                <div class="cap"><span class="data-label">Equities</span><h4>Sector Rotation Matrix</h4></div>
+              </article>
+              <article class="carousel-card" data-title="FX Volatility Regime Report" data-desc="GARCH-implied vol surfaces versus realised vol with regime classification (low / normal / stress). Includes carry trade risk flags for major EM baskets.">
+                <img src="https://banegaseverth2-png.github.io/3463-7/53.jpg" alt="FX volatility">
+                <div class="cap"><span class="data-label">FX</span><h4>Volatility Regime Report</h4></div>
+              </article>
+              <article class="carousel-card" data-title="UK Policy Brief — May 2026" data-desc="Executive summary of FCA, PRA, and HM Treasury publications affecting wholesale markets. Includes implementation timelines and peer adoption benchmarks.">
+                <img src="https://banegaseverth2-png.github.io/3463-7/54.jpg" alt="Policy brief">
+                <div class="cap"><span class="data-label">Regulatory</span><h4>UK Policy Brief</h4></div>
+              </article>
+            </div>
+            <div class="carousel-nav sans">
+              <button type="button" id="carPrev" aria-label="Previous">←</button>
+              <button type="button" id="carNext" aria-label="Next">→</button>
+            </div>
+          </div>
+          <div class="insight-detail sans" id="insightDetail">
+            <span class="data-label">Selected Report</span>
+            <h3 id="insightTitle">Global Macro Dashboard Q1 2026</h3>
+            <p id="insightDesc" class="prose" style="margin-top:0.5rem;">Consolidated view of G10 rates, inflation surprises, and central bank path probabilities. Updated daily with scenario-weighted forecasts and client-specific hedge recommendations.</p>
+          </div>
+        </section>
+
+        <!-- APPROACH -->
+        <section class="page-panel" id="panel-approach" data-label="Approach" data-crumb="Consulting Methodology">
+          <div class="page-hero">
+            <span class="tag sans">How We Work</span>
+            <h2>A Disciplined Four-Stage Framework</h2>
+            <p class="lead">Every Apext engagement follows a proven methodology designed for transparency, speed, and measurable outcomes. Click each stage on the timeline to view detailed activities and deliverables.</p>
+          </div>
+          <div class="timeline sans" id="timeline">
+            <div class="tl-step active" data-step="0"><div class="tl-dot">01</div><span>Discovery</span></div>
+            <div class="tl-step" data-step="1"><div class="tl-dot">02</div><span>Acquisition</span></div>
+            <div class="tl-step" data-step="2"><div class="tl-dot">03</div><span>Analysis</span></div>
+            <div class="tl-step" data-step="3"><div class="tl-dot">04</div><span>Partnership</span></div>
+          </div>
+          <div class="tl-content" id="tlContent">
+            <span class="data-label">Stage 01 — Discovery & Scoping</span>
+            <h3>Define Precision Before Data</h3>
+            <p class="prose" style="margin-top:0.75rem;">We conduct stakeholder interviews, audit existing information flows, and map decision timelines. Outputs include a scoped Statement of Work, data inventory, success metrics, and RACI matrix. Typical duration: 1–2 weeks. No data processing begins until sign-off.</p>
+          </div>
+        </section>
+
+        <!-- TEAM -->
+        <section class="page-panel" id="panel-team" data-label="Leadership" data-crumb="Executive Team">
+          <div class="page-hero">
+            <span class="tag sans">Our People</span>
+            <h2>Leadership With Markets DNA</h2>
+            <p class="lead">Tap any profile card to flip and read extended biographies. Our partners collectively bring over sixty years of experience across investment banking, asset management, and public policy.</p>
+          </div>
+          <div class="team-grid">
+            <div class="team-card" tabindex="0">
+              <div class="team-inner">
+                <div class="team-face front">
+                  <img src="https://banegaseverth2-png.github.io/3463-7/55.jpg" alt="James Whitmore">
+                  <div class="info"><h4>James Whitmore</h4><p class="role">Chief Executive Officer</p></div>
+                </div>
+                <div class="team-face back sans">
+                  <span class="data-label">Profile</span>
+                  <h4>James Whitmore</h4>
+                  <p>22 years at Tier-1 institutions. Led EMEA equities strategy and institutional sales. MBA, London Business School. James sets firm strategy and oversees key client relationships.</p>
+                </div>
+              </div>
+            </div>
+            <div class="team-card" tabindex="0">
+              <div class="team-inner">
+                <div class="team-face front">
+                  <img src="https://banegaseverth2-png.github.io/3463-7/56.jpg" alt="Dr. Elena Vasquez">
+                  <div class="info"><h4>Dr. Elena Vasquez</h4><p class="role">Head of Research</p></div>
+                </div>
+                <div class="team-face back sans">
+                  <span class="data-label">Profile</span>
+                  <h4>Dr. Elena Vasquez</h4>
+                  <p>PhD Econometrics, LSE. Former head of macro research at a €80bn AUM manager. Elena governs research standards, model validation, and analyst development programmes.</p>
+                </div>
+              </div>
+            </div>
+            <div class="team-card" tabindex="0">
+              <div class="team-inner">
+                <div class="team-face front">
+                  <img src="https://banegaseverth2-png.github.io/3463-7/57.jpg" alt="David Chen">
+                  <div class="info"><h4>David Chen</h4><p class="role">Chief Compliance Officer</p></div>
+                </div>
+                <div class="team-face back sans">
+                  <span class="data-label">Profile</span>
+                  <h4>David Chen</h4>
+                  <p>15 years regulatory affairs (FCA, ESMA). Qualified solicitor. David ensures all deliverables meet conduct standards and leads our regulatory intelligence practice.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="flip-hint">Click or tap cards to flip · Press Enter when focused</p>
+        </section>
+
+        <!-- CONTACT -->
+        <section class="page-panel" id="panel-contact" data-label="Contact" data-crumb="Enquiries & Office">
+          <div class="page-hero">
+            <span class="tag sans">Get In Touch</span>
+            <h2>Start a Conversation With Apext</h2>
+            <p class="lead">Visit our Carlisle headquarters, call our direct line, or submit the form below. All institutional enquiries receive a response within one UK business day.</p>
+          </div>
+          <div class="contact-layout">
+            <div class="contact-card sans">
+              <h3 style="color:var(--primary);margin-bottom:1.25rem;">Office & Direct Line</h3>
+              <div class="row">
+                <div class="ico">📍</div>
+                <div>
+                  <span class="data-label">Registered Address</span>
+                  <p>42 W Tower St, Carlisle, England, United Kingdom</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="ico">📞</div>
+                <div>
+                  <span class="data-label">Telephone</span>
+                  <p><a href="tel:+447839899194" style="color:#fff;">+44 7839 899194</a></p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="ico">✉️</div>
+                <div>
+                  <span class="data-label">Email</span>
+                  <p><a href="mailto:enquiries@Apext-consulting.co.uk" style="color:#fff;">enquiries@Apext-consulting.co.uk</a></p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="ico">🕐</div>
+                <div>
+                  <span class="data-label">Hours</span>
+                  <p>Monday – Friday, 08:00 – 18:00 GMT</p>
+                </div>
+              </div>
+              <p class="data-note" style="margin-top:1rem;opacity:0.7;">Apext Financial Information Consulting Ltd. · Company No. 09482173 (fictional placeholder)</p>
+            </div>
+            <div class="form-box sans">
+              <h3>Send an Enquiry</h3>
+              <form id="contactForm">
+                <div class="fg-row">
+                  <div class="fg"><label for="fn">First Name</label><input id="fn" name="fn" type="text" placeholder="First name"></div>
+                  <div class="fg"><label for="ln">Last Name</label><input id="ln" name="ln" type="text" placeholder="Last name"></div>
+                </div>
+                <div class="fg"><label for="em">Email</label><input id="em" name="em" type="email" placeholder="you@institution.com"></div>
+                <div class="fg"><label for="org">Organisation</label><input id="org" name="org" type="text" placeholder="Firm name"></div>
+                <div class="fg">
+                  <label for="svc">Service Interest</label>
+                  <select id="svc" name="svc">
+                    <option value="">Select area</option>
+                    <option>Market Intelligence</option>
+                    <option>Compliance Advisory</option>
+                    <option>Risk Analytics</option>
+                    <option>Corporate Finance</option>
+                    <option>ESG Advisory</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="fg"><label for="msg">Message</label><textarea id="msg" name="msg" rows="4" placeholder="How can we assist?"></textarea></div>
+                <button type="submit" class="btn btn-red" style="width:100%">Submit Enquiry</button>
+              </form>
+              <div class="form-success" id="formSuccess">
+                <h4>✓ Submission Successful</h4>
+                <p>Thank you for contacting Apext. Your message has been received.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <nav class="mobile-nav sans" id="mobileNav" aria-label="Mobile navigation">
+    <div class="mobile-nav-inner">
+      <button class="mob-btn active" data-page="home">Home</button>
+      <button class="mob-btn" data-page="about">About</button>
+      <button class="mob-btn" data-page="services">Services</button>
+      <button class="mob-btn" data-page="insights">Insights</button>
+      <button class="mob-btn" data-page="approach">Approach</button>
+      <button class="mob-btn" data-page="team">Team</button>
+      <button class="mob-btn" data-page="contact">Contact</button>
+    </div>
+  </nav>
+
+  <script>
+    (function () {
+      var panels = document.querySelectorAll('.page-panel');
+      var navItems = document.querySelectorAll('.nav-item');
+      var mobBtns = document.querySelectorAll('.mob-btn');
+      var pageLabel = document.getElementById('pageLabel');
+      var breadcrumbText = document.getElementById('breadcrumbText');
+      var viewport = document.getElementById('viewport');
+      var sidebar = document.getElementById('sidebar');
+      var overlay = document.getElementById('overlay');
+      var menuFab = document.getElementById('menuFab');
+      var currentPage = 'home';
+
+      var tlData = [
+        { label: 'Stage 01 — Discovery & Scoping', title: 'Define Precision Before Data', text: 'We conduct stakeholder interviews, audit existing information flows, and map decision timelines. Outputs include a scoped Statement of Work, data inventory, success metrics, and RACI matrix. Typical duration: 1–2 weeks.' },
+        { label: 'Stage 02 — Data Acquisition', title: 'Unify Sources Into One Truth Layer', text: 'Proprietary and licensed feeds (Bloomberg, Refinitiv, national statistics) are ingested, validated, and normalised. We document lineage, refresh cadence, and fallback procedures. 200+ verified sources in our standard catalogue.' },
+        { label: 'Stage 03 — Analysis & Delivery', title: 'Insight With Accountability', text: 'Senior analysts produce recommendations with explicit confidence intervals and dissent notes. All outputs pass peer review. Delivery via portal, API, email, or printed board packs per your preference.' },
+        { label: 'Stage 04 — Ongoing Partnership', title: 'Intelligence That Evolves With You', text: 'Quarterly business reviews, alert recalibration, and methodology updates ensure continued relevance. A named account director remains your single point of escalation.' }
+      ];
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+        menuFab.classList.remove('open');
+      }
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+        menuFab.classList.add('open');
+      }
+
+      menuFab.addEventListener('click', function () {
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+      });
+      overlay.addEventListener('click', closeSidebar);
+
+      function goToPage(id) {
+        if (id === currentPage) { closeSidebar(); return; }
+        var prev = document.getElementById('panel-' + currentPage);
+        var next = document.getElementById('panel-' + id);
+        if (!next) return;
+
+        prev.classList.remove('active');
+        prev.classList.add('exit-left');
+        next.classList.add('active');
+        viewport.scrollTop = 0;
+        next.scrollTop = 0;
+
+        setTimeout(function () {
+          prev.classList.remove('exit-left');
+          panels.forEach(function (p) {
+            if (p !== next) p.classList.remove('active');
+          });
+        }, 400);
+
+        currentPage = id;
+        pageLabel.textContent = next.getAttribute('data-label') || id;
+        breadcrumbText.textContent = next.getAttribute('data-crumb') || '';
+
+        navItems.forEach(function (n) {
+          n.classList.toggle('active', n.getAttribute('data-page') === id);
+        });
+        mobBtns.forEach(function (b) {
+          b.classList.toggle('active', b.getAttribute('data-page') === id);
+        });
+
+        if (history.replaceState) history.replaceState(null, '', '#' + id);
+        closeSidebar();
+      }
+
+      navItems.forEach(function (btn) {
+        btn.addEventListener('click', function () { goToPage(btn.getAttribute('data-page')); });
+      });
+      mobBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () { goToPage(btn.getAttribute('data-page')); });
+      });
+      document.querySelectorAll('.goto').forEach(function (b) {
+        b.addEventListener('click', function () { goToPage(b.getAttribute('data-goto')); });
+      });
+
+      if (location.hash) {
+        var h = location.hash.replace('#', '');
+        if (document.getElementById('panel-' + h)) goToPage(h);
+      }
+      window.addEventListener('hashchange', function () {
+        var h2 = location.hash.replace('#', '');
+        if (document.getElementById('panel-' + h2)) goToPage(h2);
+      });
+
+      /* Home thumbnails */
+      var heroImg = document.getElementById('heroMainImg');
+      document.querySelectorAll('#thumbRow img').forEach(function (thumb) {
+        thumb.addEventListener('click', function () {
+          heroImg.src = thumb.src;
+          document.querySelectorAll('#thumbRow img').forEach(function (t) { t.classList.remove('active'); });
+          thumb.classList.add('active');
+        });
+      });
+
+      /* Accordion */
+      document.querySelectorAll('.acc-item').forEach(function (item) {
+        var head = item.querySelector('.acc-head');
+        var body = item.querySelector('.acc-body');
+        head.addEventListener('click', function () {
+          var isOpen = item.classList.contains('open');
+          document.querySelectorAll('.acc-item').forEach(function (other) {
+            other.classList.remove('open');
+            other.querySelector('.acc-body').style.maxHeight = null;
+          });
+          if (!isOpen) {
+            item.classList.add('open');
+            body.style.maxHeight = body.scrollHeight + 'px';
+          }
+        });
+      });
+      var firstAcc = document.querySelector('.acc-item.open .acc-body');
+      if (firstAcc) firstAcc.style.maxHeight = firstAcc.scrollHeight + 'px';
+
+      /* Service tabs */
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      var tabPanels = document.querySelectorAll('.tab-panel');
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-tab');
+          tabBtns.forEach(function (b) { b.classList.remove('active'); });
+          tabPanels.forEach(function (p) { p.classList.remove('active'); });
+          btn.classList.add('active');
+          document.getElementById(id).classList.add('active');
+        });
+      });
+
+      /* Carousel */
+      var cards = document.querySelectorAll('.carousel-card');
+      var carEl = document.getElementById('carousel');
+      var iTitle = document.getElementById('insightTitle');
+      var iDesc = document.getElementById('insightDesc');
+      var carIdx = 0;
+
+      function selectCard(idx) {
+        carIdx = idx;
+        cards.forEach(function (c, i) {
+          c.classList.toggle('active', i === idx);
+          if (i === idx) {
+            iTitle.textContent = c.getAttribute('data-title');
+            iDesc.textContent = c.getAttribute('data-desc');
+            c.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
+        });
+      }
+      cards.forEach(function (c, i) {
+        c.addEventListener('click', function () { selectCard(i); });
+      });
+      document.getElementById('carPrev').addEventListener('click', function () {
+        selectCard((carIdx - 1 + cards.length) % cards.length);
+      });
+      document.getElementById('carNext').addEventListener('click', function () {
+        selectCard((carIdx + 1) % cards.length);
+      });
+
+      /* Timeline */
+      var tlSteps = document.querySelectorAll('.tl-step');
+      var tlContent = document.getElementById('tlContent');
+      tlSteps.forEach(function (step) {
+        step.addEventListener('click', function () {
+          var i = parseInt(step.getAttribute('data-step'), 10);
+          var d = tlData[i];
+          tlSteps.forEach(function (s) { s.classList.remove('active'); });
+          step.classList.add('active');
+          tlContent.innerHTML = '<span class="data-label">' + d.label + '</span><h3>' + d.title + '</h3><p class="prose" style="margin-top:0.75rem;">' + d.text + '</p>';
+        });
+      });
+
+      /* Team flip */
+      document.querySelectorAll('.team-card').forEach(function (card) {
+        function flip() { card.classList.toggle('flipped'); }
+        card.addEventListener('click', flip);
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
+        });
+      });
+
+      /* Contact form */
+      document.getElementById('contactForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        document.getElementById('formSuccess').classList.add('show');
+        e.target.reset();
+      });
+
+      /* Clock */
+      function tick() {
+        var now = new Date();
+        document.getElementById('liveClock').textContent = now.toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+      }
+      tick();
+      setInterval(tick, 30000);
+    })();
+  </script>
+</body>
+</html>
